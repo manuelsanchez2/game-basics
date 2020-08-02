@@ -233,8 +233,9 @@ Parecia complicado al principio, pero tiene su logica. En el momento en el que l
             movingY = -movingY;
         }
         else {
-            // alert("GAME OVER");
+            
             document.location.reload();
+            // alert("GAME OVER");
         }
     }
 ```
@@ -411,3 +412,65 @@ function collisionDetection() {
 ```
 y anadir la funcion collissionDetection() al loop justo despues de createPaddle().
 ![blocks-working](./assets/block-working.gif)
+
+### Crear un marcador
+
+1. Primero necesitamos crear la variable con let score = 0;
+2. Luego necesitamos crear la funcion createScore para mostroslo por pantalla.
+
+```js
+function createScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "ffce00";
+    ctx.fillText("Score: "+ score, 8, 20);
+}
+```
+
+Con respecto a fillText tenemos tres parametros, el texto y las dos coordenadas. El fillStyle se aplica al texto en si, claro.
+
+3. En lo de collissiondetection, cuando dijimos que si se le daba a un ladrillo, desapareciera, tambien le vamos a sumar una de score.
+
+```js
+function collisionDetection() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            if (b.status == 1) {
+                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                    movingY = -movingY;
+                    b.status = 0;  
+                    score++;
+            }
+            
+            }
+        }
+    }
+}
+```
+4. Llamamos la funcion con createScore() en el loop.\
+
+![score-creation](./assets/score-creation.png)
+
+5. Creamos tipico mensaje de victoria cuando lleguemos a 15. 
+
+```js
+function collisionDetection() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            if (b.status == 1) {
+                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                    movingY = -movingY;
+                    b.status = 0;  
+                    score++;
+                    if(score == 15) {
+                        alert("YOU WIN, CONGRATULATIONS");
+                        document.location.reload();
+                    }
+            }
+            
+            }
+        }
+    }
+}
+```
