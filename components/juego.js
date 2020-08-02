@@ -22,6 +22,7 @@ let brickOffsetTop = 20;
 let brickOffsetLeft = 10;
 
 let score = 0;
+let lives = 3;
 
 // Ahora vamos a crear la funcion o array que prepare la disposicion de los ladrillos. Vamos a utilizar la funcion for y en el index vamos a utilizar c para las columnas y r para las filas. El maximo de length tipico que se utiliza en el for lo vamos a limitar con brickRowCount y brickColumnCount. Se habla de un bucle dentro y otro de fuera por dos razones.
 
@@ -94,6 +95,12 @@ function createScore() {
     ctx.fillText("Score: "+ score, 8, 14);
 }
 
+function createLives() {
+    ctx.font = "10px Arial";
+    ctx.fillStyle = "red";
+    ctx.fillText("Lives: "+lives, canvas.width-45, 15);
+}
+
 function createBall() {
     ctx.beginPath();
     ctx.arc(x, y, ballRadius, 0, Math.PI*2);
@@ -139,6 +146,7 @@ function loopCleanCanvas() {
     createBall(); // invoca la funcion de arriba y crea la bola en la posicion inicial
     createPaddle();   
     createScore();
+    createLives();
     collisionDetection(); 
    
     if (x + movingX > canvas.width - ballRadius || x + movingX < ballRadius ) {
@@ -152,9 +160,18 @@ function loopCleanCanvas() {
             movingY = -movingY;
         }
         else {
-            // alert("GAME OVER");
-            document.location.reload();
-            alert("GAME OVER");
+            lives--;
+            if(!lives) {
+                document.location.reload();
+                alert("GAME OVER");
+            } else {
+                x = canvas.width/2;
+                y = canvas.height-30;
+                movingX = 3;
+                movingY = -3;
+                paddleX = (canvas.width-paddleWidth)/2;
+            }
+            
         }
     }
 
@@ -168,9 +185,7 @@ function loopCleanCanvas() {
     x += movingX; // x = x + 2
     y += movingY; // y = y - 2
   
-    // Se vuelve a repetir todo pero con los valores de x e y cambiados y recordados para la siguiente vuelta del loop.
-    
+    requestAnimationFrame(loopCleanCanvas);
 }
 
-
-setInterval(loopCleanCanvas, 20); // cada 40 milisegundos se borra el lienzo.
+loopCleanCanvas();

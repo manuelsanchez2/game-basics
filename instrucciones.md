@@ -494,3 +494,50 @@ function mouseMoveHandler(e) {
 Tenemos la declaracion de la variable relativeX, que va a ser la posicion horizontal del raton. Va a ser igual a la posicion horizontal del viewport (e.clientX) - el borde izquierdo del canvas.
 
 Luego la condicional dice que si se cumple la condicion de que eso es mayor que 0 y menor que el final del canvas, entonces la parte izquierda de la pala sera igual a la diferencia entre la posicion x nueva menos el ancho de la pala partido 2.
+
+Se supone que cambia las coordenadas segun el puntero del raton.
+Problema puedes sacar la mitad de la paleta del canvas con esto.
+
+### Darle vidas al jugador
+
+1. Creamos la variable con el numero de vidas que tenemos.
+```js
+let lives = 3;
+```
+
+2. Vamos a mostrar en pantalla el numero de vidas tambien. Se hace de la misma forma que lo habiamos hecho con el score.
+
+De la misma forma con fillText tenemos tres parametros: texto y las dos coordenaas.
+
+```js
+function createLives() {
+    ctx.font = "10px Arial";
+    ctx.fillStyle = "red";
+    ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+}
+```
+
+3. En el loop tenemos que cambiar lo del gameover que teniamos por una vida menos. Y luego le decimos al programa que ahora si, si no hay vidas, game over.
+
+```js
+if(!lives) {
+    alert("GAME OVER");
+    document.location.reload();
+}
+else {
+    x = canvas.width/2;
+    y = canvas.height-30;
+    dx = 2;
+    dy = -2;
+    paddleX = (canvas.width-paddleWidth)/2;
+}
+```
+![life-counter](./assets/life-counter.png)
+
+### Truco para mejorar el refresh
+
+
+Hay una forma mejor de refrescar la imagen mejor que con setInterval(loopCleanCanva, 20) y es utilizando primero requestAnimationFrame(loopCleanCanva)y luego despues de los corchetes loopCleanCanva();
+
+Lo que hace es que sea el navegador quien decida la velocidad del refreshing y no una estipulada ya por si.
+![refreshing-improvement](./assets/refreshing-improvement.png)
