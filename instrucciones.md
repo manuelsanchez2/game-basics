@@ -474,3 +474,23 @@ function collisionDetection() {
     }
 }
 ```
+
+### Le vamos a meter movimiento de raton, para que sea mas entretenido
+
+1. crear el addEventListener correspondiente justo debajo de los keydown y keyup:
+`document.addEventListener("mousemove", mouseMoveActivator, false);`
+
+2. Luego creamos la funcion que estabamos hablando antes, mouseMoveActivator. aqui vienen cosas interesantes:
+
+```js
+function mouseMoveHandler(e) {
+    var relativeX = e.clientX - canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < canvas.width) {
+        paddleX = relativeX - paddleWidth/2;
+    }
+}
+```
+
+Tenemos la declaracion de la variable relativeX, que va a ser la posicion horizontal del raton. Va a ser igual a la posicion horizontal del viewport (e.clientX) - el borde izquierdo del canvas.
+
+Luego la condicional dice que si se cumple la condicion de que eso es mayor que 0 y menor que el final del canvas, entonces la parte izquierda de la pala sera igual a la diferencia entre la posicion x nueva menos el ancho de la pala partido 2.

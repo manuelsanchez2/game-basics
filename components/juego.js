@@ -26,7 +26,7 @@ let score = 0;
 // Ahora vamos a crear la funcion o array que prepare la disposicion de los ladrillos. Vamos a utilizar la funcion for y en el index vamos a utilizar c para las columnas y r para las filas. El maximo de length tipico que se utiliza en el for lo vamos a limitar con brickRowCount y brickColumnCount. Se habla de un bucle dentro y otro de fuera por dos razones.
 
 /// bucle: 0, 0, 0, 0, 0
-            0, 0, 0, 0, 0
+            // 0, 0, 0, 0, 0
 //          0, 0, 0, 0, 0
 // El ultimo ladrillo es el [2][4]. Nosotros lo que le decimos al programa con el bucle creado es que primero empiece a mirar la columna 0, que es la primera y que dentro de esa matriz o Array, haga la funcion de ir creando las columnas hasta que llegue al maximo, una vez termine empezara con la columna 1 y empezara a rellenar ladrillos hasta el [1][2]. Y asi hasta que esten todos listos.
 
@@ -43,6 +43,7 @@ let leftPressed = false;
 
 document.addEventListener("keydown", keyDownActivator, false);
 document.addEventListener("keyup", keyUpActivator, false);
+document.addEventListener("mousemove", mouseMoveActivator, false);
 
 function keyDownActivator(e) {
     if(e.keyCode == 39) {
@@ -57,6 +58,13 @@ function keyUpActivator(e) {
         rightPressed = false;
     } else if(e.keyCode == 37) {
         leftPressed = false;
+    }
+}
+
+function mouseMoveActivator(e) {
+    let relativeX = e.clientX - canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < canvas.width) {
+        paddleX = relativeX - paddleWidth/2;
     }
 }
 
