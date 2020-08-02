@@ -13,6 +13,30 @@ let paddleHeight = 10; //esto es la altura de la paleta
 let paddleWidth = 75; // esto es el ancho de la paleta
 let paddleX = (canvas.width-paddleWidth)/2; //posicion en la que empieza a dibujarse
 
+var brickRowCount = 3;
+var brickColumnCount = 5;
+var brickWidth = 55;
+var brickHeight = 10;
+var brickPadding = 1.5;
+var brickOffsetTop = 20;
+var brickOffsetLeft = 10;
+
+
+// Ahora vamos a crear la funcion o array que prepare la disposicion de los ladrillos. Vamos a utilizar la funcion for y en el index vamos a utilizar c para las columnas y r para las filas. El maximo de length tipico que se utiliza en el for lo vamos a limitar con brickRowCount y brickColumnCount. Se habla de un bucle dentro y otro de fuera por dos razones.
+
+/// bucle: 0, 0, 0, 0, 0
+            0, 0, 0, 0, 0
+//          0, 0, 0, 0, 0
+// El ultimo ladrillo es el [2][4]. Nosotros lo que le decimos al programa con el bucle creado es que primero empiece a mirar la columna 0, que es la primera y que dentro de esa matriz o Array, haga la funcion de ir creando las columnas hasta que llegue al maximo, una vez termine empezara con la columna 1 y empezara a rellenar ladrillos hasta el [1][2]. Y asi hasta que esten todos listos.
+
+var bricks = [];
+for(c=0; c<brickColumnCount; c++) {
+    bricks[c] = [];
+    for(r=0; r<brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0, status: 1 };
+    }
+}
+
 let rightPressed = false;
 let leftPressed = false;
 
@@ -32,6 +56,21 @@ function keyUpActivator(e) {
         rightPressed = false;
     } else if(e.keyCode == 37) {
         leftPressed = false;
+    }
+}
+
+function collisionDetection() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            if (b.status == 1) {
+                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                    movingY = -movingY;
+                    b.status = 0;  
+            }
+            
+            }
+        }
     }
 }
 
@@ -55,10 +94,31 @@ function createPaddle() {
     ctx.closePath();
 }
 
+function createBricks() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            if (bricks[c][r].status == 1) {
+                var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+                var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();   
+            }
+        }
+    }
+}
+
+
 function loopCleanCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // limpieza
-    createPaddle();    
+    createBricks();
     createBall(); // invoca la funcion de arriba y crea la bola en la posicion inicial
+    createPaddle();   
+    collisionDetection(); 
    
     if (x + movingX > canvas.width - ballRadius || x + movingX < ballRadius ) {
         movingX = -movingX;

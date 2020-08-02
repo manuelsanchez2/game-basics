@@ -244,3 +244,170 @@ Ahora vamos a otro tema interesante, para que el juego no se nos haga aburrido, 
 https://developer.mozilla.org/es/docs/Games/Workflows/Famoso_juego_2D_usando_JavaScript_puro/Construye_grupo_bloques
 
 ### CREAR UN MURO DE LADRILLOS
+
+Esto se va a complicar. Lo primero que hacemos es crear unas cuantas variables que nos den valores sobre los ladrillos. Vamos a crear el numero de filas y columnas, el ancho y el alto de cada ladrillo, un padding para que no se toquen entre ellos y finalmente unos margenes top y left para que no esten pegados a los bordes del canvas.
+
+```js
+var brickRowCount = 3;
+var brickColumnCount = 5;
+var brickWidth = 75;
+var brickHeight = 20;
+var brickPadding = 10;
+var brickOffsetTop = 30;
+var brickOffsetLeft = 30;
+```
+
+#### La matriz dimensional
+
+Ahora vamos a crear la funcion o array que prepare la disposicion de los ladrillos. Vamos a utilizar la funcion for y en el index vamos a utilizar c para las columnas y r para las filas. El maximo de length tipico que se utiliza en el for lo vamos a limitar con brickRowCount y brickColumnCount. Se habla de un bucle dentro y otro de fuera por dos razones.
+
+     bucle: 0, 0, 0, 0, 0
+            0, 0, 0, 0, 0
+            0, 0, 0, 0, 0
+
+El ultimo ladrillo es el [2][4]. Nosotros lo que le decimos al programa con el bucle creado es que primero empiece a mirar la columna 0, que es la primera y que dentro de esa matriz o Array, haga la funcion de ir creando las columnas hasta que llegue al maximo, una vez termine empezara con la columna 1 y empezara a rellenar ladrillos hasta el [1][2]. Y asi hasta que esten todos listos.
+
+```js
+var bricks = [];
+for(c=0; c<brickColumnCount; c++) {
+    bricks[c] = [];
+    for(r=0; r<brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0 };
+    }
+}
+```
+
+Lo siguiente que vamos a hacer es crear los bloques en pantalla con la funcion createBricks() y dentro le vamos a explicitar algo muy parecido a lo anterior con la diferencia de que le aclaramos que empiece en posicion 0. Tambien vamos a crear ya los bloques. Dentro del bucle de dentro.
+
+```js
+function createBricks() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            bricks[c][r].x = 0;
+            bricks[c][r].y = 0;
+            ctx.beginPath();
+            ctx.rect(0, 0, brickWidth, brickHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+}
+```
+![bricks](./assets/bricks-first-attempt.png)
+
+Ahora lo que vamos a hacer es distribuir los ladrillos... porque claro, ahora tenemos todas en la misma posicion.
+
+Eso se hace con las siguientes declaraciones:
+
+```js
+let brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+
+```
+
+Luego hay que meterlo en la funcion de createBricks() que estamos creando:
+```js
+function createBricks() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            let brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+            let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+}
+```
+En este punto no entiendo muy bien la declaracion de variables anterior. Desde que empezamos con lo del for dentro del for me perdi un poco y luego a partir de ahi hemos utilizado lo de brickX y brickY para calcular los puntos de comienzo de cada uno de los ladrillos. 
+
+
+### CREANDO COLISIONES CON LOS LADRILLOS.
+
+De primeras, no hay una funcion del canvas que nos permita averiguar si la bola esta tocando el rectangulo. La forma mas sencilla de controlarlo es comprobando si el centro de la bola esta tocando cualquiera de los ladrillos.
+
+Vamos a crear una funcion que compruebe en cada fotograma si los ladrillos han sido tocados por la bola. Para ello necesitamos la variable b de brick que utilizaremos para almacenar esa informacion.
+
+```js
+function collisionDetection() {
+      for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            // calculations here
+}
+```
+
+Ahora tenemos que crear la condicional que diga que si la bola esta dentro de las coordenadas de uno de los ladrillos, hay que cambiar la direccion del ladrillo.
+Para ello se tienen que cumplir estas cuatro condiciones:
+- la posicion x de la bola es mayor que la x inicial del ladrillo
+- la posicion x de la bola es menor que la inicial del ladrillo + su ancho
+- la posicion y de la bola es mayor que la x inciial del ladrillo
+- la posicion y de la bola es menor que la inicial del ladrillo + su altura
+
+```js
+function collisionDetection() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                movingY = -movingY;
+            }
+        }
+    }
+}
+
+```
+Ahora mismo funcionaria, lo que pasa es que los ladrillos no desaparecen los muy jedidos. Para hacer qeu desaparezcan primero vamos a meterle el status 1 a la funcion de los ladrillos que teniamos antes. Tanto en la variable como en la funcion de createBricks.
+
+```js
+var bricks = [];
+for(c=0; c<brickColumnCount; c++) {
+    bricks[c] = [];
+    for(r=0; r<brickRowCount; r++) {
+        bricks[c][r] = { x: 0, y: 0, status: 1 };
+    }
+}
+
+function createBricks() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            if (bricks[c][r].status == 1) {
+                var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+                var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();   
+            }
+        }
+    }
+}
+```
+Le vamos a decir al programa que si status vale 1 se dibuja el ladrillo pero que si vale 0 que no, porque eso significara que ha sido golpeado por la bola. 
+
+Para eso solo hay que modificar la funcion de collissionDetection():
+```js
+function collisionDetection() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+            if(b.status == 1) {
+                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                    dy = -dy;
+                    b.status = 0;
+                }
+            }
+        }
+    }
+}
+```
+y anadir la funcion collissionDetection() al loop justo despues de createPaddle().
+![blocks-working](./assets/block-working.gif)
