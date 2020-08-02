@@ -13,14 +13,15 @@ let paddleHeight = 10; //esto es la altura de la paleta
 let paddleWidth = 75; // esto es el ancho de la paleta
 let paddleX = (canvas.width-paddleWidth)/2; //posicion en la que empieza a dibujarse
 
-var brickRowCount = 3;
-var brickColumnCount = 5;
-var brickWidth = 55;
-var brickHeight = 10;
-var brickPadding = 1.5;
-var brickOffsetTop = 20;
-var brickOffsetLeft = 10;
+let brickRowCount = 3;
+let brickColumnCount = 5;
+let brickWidth = 55;
+let brickHeight = 10;
+let brickPadding = 1.5;
+let brickOffsetTop = 20;
+let brickOffsetLeft = 10;
 
+let score = 0;
 
 // Ahora vamos a crear la funcion o array que prepare la disposicion de los ladrillos. Vamos a utilizar la funcion for y en el index vamos a utilizar c para las columnas y r para las filas. El maximo de length tipico que se utiliza en el for lo vamos a limitar con brickRowCount y brickColumnCount. Se habla de un bucle dentro y otro de fuera por dos razones.
 
@@ -67,11 +68,22 @@ function collisionDetection() {
                 if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
                     movingY = -movingY;
                     b.status = 0;  
+                    score++;
+                    if(score == 15) {
+                        alert("YOU WIN, CONGRATULATIONS");
+                        document.location.reload();
+                    }
             }
             
             }
         }
     }
+}
+
+function createScore() {
+    ctx.font = "10px Arial";
+    ctx.fillStyle = "red";
+    ctx.fillText("Score: "+ score, 8, 14);
 }
 
 function createBall() {
@@ -118,6 +130,7 @@ function loopCleanCanvas() {
     createBricks();
     createBall(); // invoca la funcion de arriba y crea la bola en la posicion inicial
     createPaddle();   
+    createScore();
     collisionDetection(); 
    
     if (x + movingX > canvas.width - ballRadius || x + movingX < ballRadius ) {
@@ -133,6 +146,7 @@ function loopCleanCanvas() {
         else {
             // alert("GAME OVER");
             document.location.reload();
+            alert("GAME OVER");
         }
     }
 
