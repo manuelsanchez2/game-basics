@@ -22,11 +22,12 @@ let brickOffsetTop = 20;
 let brickOffsetLeft = 10;
 
 let score = 0;
+let lives = 3;
 
 // Ahora vamos a crear la funcion o array que prepare la disposicion de los ladrillos. Vamos a utilizar la funcion for y en el index vamos a utilizar c para las columnas y r para las filas. El maximo de length tipico que se utiliza en el for lo vamos a limitar con brickRowCount y brickColumnCount. Se habla de un bucle dentro y otro de fuera por dos razones.
 
 /// bucle: 0, 0, 0, 0, 0
-            0, 0, 0, 0, 0
+            // 0, 0, 0, 0, 0
 //          0, 0, 0, 0, 0
 // El ultimo ladrillo es el [2][4]. Nosotros lo que le decimos al programa con el bucle creado es que primero empiece a mirar la columna 0, que es la primera y que dentro de esa matriz o Array, haga la funcion de ir creando las columnas hasta que llegue al maximo, una vez termine empezara con la columna 1 y empezara a rellenar ladrillos hasta el [1][2]. Y asi hasta que esten todos listos.
 
@@ -43,6 +44,7 @@ let leftPressed = false;
 
 document.addEventListener("keydown", keyDownActivator, false);
 document.addEventListener("keyup", keyUpActivator, false);
+document.addEventListener("mousemove", mouseMoveActivator, false);
 
 function keyDownActivator(e) {
     if(e.keyCode == 39) {
@@ -57,6 +59,13 @@ function keyUpActivator(e) {
         rightPressed = false;
     } else if(e.keyCode == 37) {
         leftPressed = false;
+    }
+}
+
+function mouseMoveActivator(e) {
+    let relativeX = e.clientX - canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < canvas.width) {
+        paddleX = relativeX - paddleWidth/2;
     }
 }
 
@@ -84,6 +93,12 @@ function createScore() {
     ctx.font = "10px Arial";
     ctx.fillStyle = "red";
     ctx.fillText("Score: "+ score, 8, 14);
+}
+
+function createLives() {
+    ctx.font = "10px Arial";
+    ctx.fillStyle = "red";
+    ctx.fillText("Lives: "+lives, canvas.width-45, 15);
 }
 
 function createBall() {
@@ -131,6 +146,7 @@ function loopCleanCanvas() {
     createBall(); // invoca la funcion de arriba y crea la bola en la posicion inicial
     createPaddle();   
     createScore();
+    createLives();
     collisionDetection(); 
    
     if (x + movingX > canvas.width - ballRadius || x + movingX < ballRadius ) {
@@ -144,9 +160,18 @@ function loopCleanCanvas() {
             movingY = -movingY;
         }
         else {
-            // alert("GAME OVER");
-            document.location.reload();
-            alert("GAME OVER");
+            lives--;
+            if(!lives) {
+                document.location.reload();
+                alert("GAME OVER");
+            } else {
+                x = canvas.width/2;
+                y = canvas.height-30;
+                movingX = 3;
+                movingY = -3;
+                paddleX = (canvas.width-paddleWidth)/2;
+            }
+            
         }
     }
 
@@ -160,9 +185,7 @@ function loopCleanCanvas() {
     x += movingX; // x = x + 2
     y += movingY; // y = y - 2
   
-    // Se vuelve a repetir todo pero con los valores de x e y cambiados y recordados para la siguiente vuelta del loop.
-    
+    requestAnimationFrame(loopCleanCanvas);
 }
 
-
-setInterval(loopCleanCanvas, 20); // cada 40 milisegundos se borra el lienzo.
+loopCleanCanvas();
